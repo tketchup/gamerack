@@ -6,9 +6,11 @@
   bisher gespielten Stunden. Sortierung, Filter „Nur Backlog“ ab 60 Punkten und
   eine Zeile auf der Detailseite
 * **Statistikseite** über einen Knopf in der Kopfleiste: Spielzeit, Starts,
-  gespielte Spiele, Durchschnitt pro aktivem Tag und eine Bestenliste nach
-  Spielzeit oder Starts. Zeitraum als Woche, Monat, Jahr, jemals oder eigener
-  Bereich; Klick auf eine Zeile öffnet das Spiel
+  gespielte Spiele, Durchschnitt und eine Bestenliste nach Spielzeit oder
+  Starts. Zeitraum als Woche, Monat, Jahr, jemals oder eigener Bereich; Klick
+  auf eine Zeile öffnet das Spiel. „Jemals“ rechnet aus den Gesamtständen der
+  Launcher und ist damit sofort vollständig; die begrenzten Zeiträume brauchen
+  die eigene Aufzeichnung und füllen sich erst
 * **Verlaufsaufzeichnung** in `history.jsonl`, angehängt und nie umgeschrieben.
   Jeder Start sofort, jeder von einem Launcher gemeldete Zuwachs an Spielzeit
   beim nächsten Suchlauf. Sprünge über 24 Stunden werden verworfen, statt einem

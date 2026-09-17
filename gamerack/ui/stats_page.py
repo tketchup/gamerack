@@ -191,9 +191,31 @@ class StatsPage(Adw.NavigationPage):
 
     # --- population ---------------------------------------------------------
 
+    def _totals(self) -> dict[str, dict[str, int]]:
+        """Where the figures come from, which differs by period.
+
+        "Ever" is answerable without our log: the launchers keep a running
+        total per game, and that is complete back to the day it was bought.
+        What they never kept is *when* — so every bounded period has to come
+        from the log instead, and starts there from nothing.
+        """
+        if self.period == "ever":
+            return self._library_totals()
+        return self.history.totals(self._from, self._to)
+
+    def _library_totals(self) -> dict[str, dict[str, int]]:
+        out: dict[str, dict[str, int]] = {}
+        for game_id, game in self.library.games.items():
+            if game.removed:
+                continue
+            if game.play_seconds or game.play_count:
+                out[game_id] = {"seconds": int(game.play_seconds),
+                                "launches": int(game.play_count)}
+        return out
+
     def refresh(self) -> None:
         self._sync_date_buttons()
-        totals = self.history.totals(self._from, self._to)
+        totals = self._totals()
         rows = self._rank(totals)
 
         self._fill_note()
@@ -211,7 +233,7 @@ class StatsPage(Adw.NavigationPage):
         if not has_rows:
             # An empty log and an empty period are different problems, and on
             # the first day it is the former — say what fills it.
-            nothing_at_all = not self.history.totals()
+            nothing_at_all = not self.history.totals() and not self._library_totals()
             self.empty.set_description(
                 "Starte ein Spiel aus Gamerack heraus, dann erscheint es hier. "
                 "Spielzeit, die ein Launcher nachmeldet, kommt beim nächsten "
@@ -242,19 +264,33 @@ class StatsPage(Adw.NavigationPage):
 
     def _fill_note(self) -> None:
         begin = self.history.begin()
+        started = (time.strftime("%d.%m.%Y", time.localtime(begin))
+                   if begin else "")
+
+        if self.period == "ever":
+            # Two sources in one view, so say which is which: the playtime is
+            # the launcher's running total and complete, the start count is
+            # only what we have seen ourselves.
+            self.note.set_label(
+                "Die Spielzeit ist der Gesamtstand aus den Launchern. Die "
+                "Starts zählt Gamerack selbst"
+                + (f", seit {started}." if started else ".")
+            )
+            self.note.set_visible(True)
+            return
+
         if not begin:
             self.note.set_label("Die Aufzeichnung hat noch nicht begonnen.")
             self.note.set_visible(True)
             return
-        started = time.strftime("%d.%m.%Y", time.localtime(begin))
         if self._from and self._from >= begin:
             self.note.set_visible(False)
             return
-        # The honest caveat: the launchers never kept a time series, so no
-        # period can reach further back than our own log.
+        # The honest caveat: the launchers kept totals but never a time series,
+        # so a bounded period cannot reach further back than our own log.
         self.note.set_label(
             f"Aufgezeichnet wird seit {started}. Was davor gespielt wurde, "
-            "hat kein Launcher festgehalten und fehlt hier."
+            "lässt sich keinem Zeitraum zuordnen — es steckt nur in „Jemals“."
         )
         self.note.set_visible(True)
 
@@ -264,16 +300,24 @@ class StatsPage(Adw.NavigationPage):
 
         seconds = sum(e["seconds"] for e in totals.values())
         launches = sum(e["launches"] for e in totals.values())
-        days = self.history.active_days(self._from, self._to)
 
         # Four tiles, so they sit in one row. There is deliberately no
         # "most played" tile: that is rank one of the list directly below.
+        # The fourth one differs by period, because "per active day" needs the
+        # log, which for "ever" is not where the figures came from.
+        if self.period == "ever":
+            fourth = ("Ø pro Spiel",
+                      _short_playtime(round(seconds / len(rows))) if rows else "—")
+        else:
+            days = self.history.active_days(self._from, self._to)
+            fourth = (f"Ø von {days} aktiven Tagen" if days else "Ø pro Tag",
+                      _short_playtime(round(seconds / days)) if days else "—")
+
         for title, value in (
             ("Spielzeit", _short_playtime(seconds)),
             ("Starts", str(launches) if launches else "—"),
             ("Spiele", str(len(rows)) if rows else "—"),
-            (f"Ø von {days} aktiven Tagen" if days else "Ø pro Tag",
-             _short_playtime(round(seconds / days)) if days else "—"),
+            fourth,
         ):
             self.tiles.append(self._tile(title, value))
 
@@ -311,8 +355,11 @@ class StatsPage(Adw.NavigationPage):
             parts.append(_short_playtime(entry["seconds"]) + " gespielt")
         if game is None:
             parts.append("nicht mehr in der Bibliothek")
-        subtitle = Gtk.Label(label="  ·  ".join(parts) or "—", xalign=0,
-                             ellipsize=Pango.EllipsizeMode.END)
+        # Nothing to add rather than a dash: for "ever" the launch count is
+        # often simply unknown, and a placeholder would read as "zero".
+        subtitle = Gtk.Label(label="  ·  ".join(parts), xalign=0,
+                             ellipsize=Pango.EllipsizeMode.END,
+                             visible=bool(parts))
         subtitle.add_css_class("row-subtitle")
 
         key = "seconds" if self.metric == "playtime" else "launches"

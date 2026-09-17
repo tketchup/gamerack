@@ -215,11 +215,19 @@ Zeitraum wählbar als Woche, Monat, Jahr, jemals oder ein eigener Bereich über
 zwei Kalender. Woche, Monat und Jahr sind rollend gerechnet, also die letzten
 7, 30 und 365 Tage.
 
-**Die Daten beginnen mit dem ersten Start dieser Version.** Die Launcher führen
-nur Summen — Steam kennt die Gesamtspielzeit eines Spiels und den Tag, an dem es
-zuletzt lief, aber keine Zeitreihe. Was vorher gespielt wurde, hat niemand
-mitgeschrieben und fehlt hier. Die Seite sagt das auch selbst, solange der
-gewählte Zeitraum weiter zurückreicht als die Aufzeichnung.
+**„Jemals“ ist sofort vollständig, die übrigen Zeiträume füllen sich erst.**
+Die Launcher führen Summen: Steam kennt die Gesamtspielzeit eines Spiels, aber
+nicht, an welchem Tag sie zusammenkam. Deshalb rechnet „Jemals“ direkt aus der
+Bibliothek und zeigt vom ersten Start an deine ganze Spielzeit — bei 34
+gespielten Titeln derzeit 501 Stunden. Woche, Monat, Jahr und der eigene
+Bereich brauchen dagegen eine Zeitreihe, und die beginnt mit dem ersten Start
+dieser Version.
+
+Die Starts sind der umgekehrte Fall: die zählt Gamerack selbst, weil kein
+Launcher sie festhält. Bei „Jemals“ steht deshalb die Spielzeit aus dem
+Launcher neben einer Startzahl, die nur das kennt, was Gamerack gesehen hat.
+Die Seite schreibt das über die Kacheln, damit niemand die eine Zahl für so
+vollständig hält wie die andere.
 
 Mitgeschrieben wird zweierlei: jeder Start, den Gamerack auslöst, sofort, und
 jeder Zuwachs an Spielzeit, den ein Launcher meldet, beim nächsten Suchlauf.
