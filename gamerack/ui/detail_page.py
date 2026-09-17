@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import urllib.parse
 
 import gi
 
@@ -22,6 +23,7 @@ log = logging.getLogger(__name__)
 
 BANNER_HEIGHT = 300
 MOD_ROWS = 25
+HLTB_SEARCH = "https://howlongtobeat.com/?q="
 
 
 class GameDetailPage(Adw.NavigationPage):
@@ -156,6 +158,19 @@ class GameDetailPage(Adw.NavigationPage):
             row.set_subtitle_selectable(True)
             self.facts.add(row)
             self.fact_rows[key] = row
+
+        # A link, not a lookup. HowLongToBeat gates its search endpoint behind
+        # an expiring token and a computed challenge header, so there is no
+        # honest way to read the figures from here — but getting to them is
+        # one click.
+        self.hltb_row = Adw.ActionRow(
+            title="Spieldauer",
+            subtitle="Bei HowLongToBeat nachsehen",
+            activatable=True,
+        )
+        self.hltb_row.add_suffix(Gtk.Image(icon_name="external-link-symbolic"))
+        self.hltb_row.connect("activated", lambda *_: self._open_hltb())
+        self.facts.add(self.hltb_row)
 
         self.mods = Adw.PreferencesGroup(title="Mods")
         self.mods.set_visible(False)
@@ -296,6 +311,14 @@ class GameDetailPage(Adw.NavigationPage):
             self._mod_rows["_rest"] = rest
 
         self._load_mod_titles(game.game_id, [m["id"] for m in mods[:MOD_ROWS]])
+
+    def _open_hltb(self) -> None:
+        if self.game is None:
+            return
+        query = urllib.parse.quote_plus(self.game.name)
+        Gtk.UriLauncher(uri=f"{HLTB_SEARCH}{query}").launch(
+            self.get_root(), None, None, None
+        )
 
     def _open_mod(self, _row, item_id: str) -> None:
         Gtk.UriLauncher(uri=workshop_url(item_id)).launch(

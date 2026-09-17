@@ -23,6 +23,9 @@
   Bildschau aus Steam-Screenshots, 1920×1080 und damit genau 16:9, zugeschnitten
   statt verzerrt. Nur Spiele mit vorhandenem Bild, geladen erst bei Bedarf.
   Jede Eingabe beendet sie; eine ruhende Maus nicht
+* **Spieldauer**-Zeile auf der Detailseite, die die HowLongToBeat-Suche im
+  Browser öffnet. Bewusst nur ein Verweis: deren Suchschnittstelle ist mit
+  ablaufendem Token und berechnetem Zusatzschlüssel gegen Automaten abgesichert
 * **Installierte Mods** bei Steam-Spielen auf der Detailseite, mit Name, Größe
   und Änderungsdatum; Klick öffnet die Workshop-Seite. Aus den
   `appworkshop`-Dateien aller Bibliotheksordner, die Namen über den öffentlichen

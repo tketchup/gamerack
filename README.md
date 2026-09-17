@@ -73,6 +73,19 @@ vorgezogen. Abschaltbar unter Einstellungen → Bilder & Daten.
   die Reihe an beiden Enden entsprechend gepolstert.
 * **Liste** — schmale Zeilen, ein Klick klappt kurze Details aus.
 
+### Spieldauer
+
+Die Detailseite hat eine Zeile **Spieldauer**, die die Suche bei
+HowLongToBeat im Browser öffnet — als Verweis, nicht als Abfrage.
+
+HowLongToBeat hat keine offene Schnittstelle. Die Suche des Browsers verlangt
+ein ablaufendes Token und einen berechneten Zusatzschlüssel im Kopf der
+Anfrage, also eine Bot-Abwehr. Die zu umgehen wäre erstens genau das, was die
+Seite verhindern will, und zweitens beim nächsten Umbau ihrer Oberfläche wieder
+kaputt. Wenn die Zahlen einmal in Gamerack selbst stehen sollen, ist IGDB der
+richtige Weg: offizielle Schnittstelle, kostenlos mit einer Twitch-Kennung, und
+sie führt dieselben drei Werte.
+
 ### Mods
 
 Bei Steam-Spielen listet die Großansicht die installierten Workshop-Objekte mit
