@@ -265,10 +265,20 @@ Auf Arch:
 sudo pacman -S --needed python-gobject gtk4 libadwaita python-requests python-pillow python-vdf
 ```
 
-Dann im Projektordner:
+Dann den Quellcode holen:
 
 ```bash
-./install.sh
+git clone https://github.com/tketchup/gamerack.git
+```
+
+Alternativ das Archiv einer Version von der
+[Releases-Seite](https://github.com/tketchup/gamerack/releases) herunterladen
+und entpacken.
+
+Und im entstandenen Ordner:
+
+```bash
+cd gamerack && ./install.sh
 ```
 
 Das **kopiert** das Programm nach `~/.local/lib/gamerack` und legt einen Starter
