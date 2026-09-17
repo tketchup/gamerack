@@ -1,11 +1,28 @@
 # Gamerack
 
+> ## ⚠️ Dieses Programm wurde vollständig von einer KI geschrieben
+>
+> **Jede Zeile Code in diesem Repository stammt von Claude (Anthropic)**,
+> geschrieben im Auftrag und nach den Vorgaben eines Menschen. Kein Mensch hat
+> den Code Zeile für Zeile geprüft.
+>
+> Getestet wurde gegen eine echte Bibliothek mit rund 300 Spielen, und die
+> beschriebenen Funktionen tun, was hier steht. Trotzdem gilt: rechne mit
+> Fehlern, die ein menschliches Review gefunden hätte. Gamerack liest deine
+> Launcher ausschließlich — es installiert, verschiebt und löscht dort nichts —
+> aber es schreibt in deinen eigenen Datenordner, und es kommt ohne jede
+> Garantie.
+
 Eine Spielebibliothek für Linux als Ersatz für GNOME Cartridges. Findet deine
 Spiele selbst, holt Cover, Banner und Metadaten automatisch und zeigt alles
 wahlweise als Raster, Schaufenster oder Liste.
 
-Gamerack liest deine Launcher nur — es installiert, verschiebt und löscht dort
-nichts.
+## Verhältnis zu GNOME Cartridges
+
+Gamerack ist **kein Fork und kein Klon**: es enthält keine Zeile Code aus
+Cartridges. Übernommen ist die Idee — eine Spielebibliothek als Cover-Raster —
+und ein Teil der Bedienlogik. Cartridges selbst steht unter GPL-3.0 und findet
+sich unter <https://codeberg.org/kramo/cartridges>.
 
 ## Was gefunden wird
 
@@ -301,13 +318,20 @@ löschst du sie, fängt die Statistik von vorn an.
 Die Ordner oben liegen außerhalb des Projektordners. Ein Rücksprung auf eine
 ältere Version wirft deine Bibliothek also nicht weg.
 
+## Lizenz
+
+GPL-3.0-or-later, siehe [LICENSE](LICENSE). Das heißt: benutzen, ändern und
+weitergeben ist erlaubt, solange du Änderungen unter derselben Lizenz offen
+weitergibst. Ohne Gewährleistung — was bei Code ohne menschliches Review
+besonders wörtlich zu nehmen ist.
+
 ## Versionen
 
 Der Stand ist in Git festgehalten, jede Version hat eine Marke. Was sich wann
 geändert hat, steht in [CHANGELOG.md](CHANGELOG.md).
 
 ```bash
-git -C ~/Documents/code/cartridges tag
+git -C ~/Documents/code/gamerack tag
 ```
 
 Zurück auf eine ältere Version und wieder nach vorn:

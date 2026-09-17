@@ -915,9 +915,15 @@ class MainWindow(Adw.ApplicationWindow):
             developer_name="Von einer KI geschrieben",
             comments="Eine Spielebibliothek für Linux: findet Spiele in Steam, "
                      "Heroic, Lutris, Flatpak und im Anwendungsmenü und zeigt sie "
-                     "als Raster, Schaufenster oder Liste.",
+                     "als Raster, Schaufenster oder Liste.\n\n"
+                     "Dieses Programm wurde vollständig von Claude (Anthropic) "
+                     "geschrieben, nach den Vorgaben eines Menschen. Kein Mensch "
+                     "hat den Code Zeile für Zeile geprüft.\n\n"
+                     "Kein Fork von GNOME Cartridges — die Idee ist übernommen, "
+                     "der Code nicht.",
             license_type=Gtk.License.GPL_3_0,
         )
+        about.add_credit_section("Geschrieben von", ["Claude (Anthropic)"])
         about.add_credit_section("Cover-Bilder", ["SteamGridDB", "Valve Steam CDN"])
         about.present(self)
 
