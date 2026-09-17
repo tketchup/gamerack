@@ -22,7 +22,7 @@ wahlweise als Raster, Schaufenster oder Liste.
 Gamerack ist **kein Fork und kein Klon**: es enthält keine Zeile Code aus
 Cartridges. Übernommen ist die Idee — eine Spielebibliothek als Cover-Raster —
 und ein Teil der Bedienlogik. Cartridges selbst steht unter GPL-3.0 und findet
-sich unter <https://codeberg.org/kramo/cartridges>.
+sich unter <https://github.com/kra-mo/cartridges>.
 
 ## Was gefunden wird
 
