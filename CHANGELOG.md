@@ -1,5 +1,21 @@
 # Änderungsverlauf
 
+## Unveröffentlicht
+
+* **Backlog-Score**: 0 bis 100 je Spiel aus einem Launcher, aus Liegezeit und
+  bisher gespielten Stunden. Sortierung, Filter „Nur Backlog“ ab 60 Punkten und
+  eine Zeile auf der Detailseite
+* **Statistikseite** über einen Knopf in der Kopfleiste: Spielzeit, Starts,
+  gespielte Spiele, Durchschnitt pro aktivem Tag und eine Bestenliste nach
+  Spielzeit oder Starts. Zeitraum als Woche, Monat, Jahr, jemals oder eigener
+  Bereich; Klick auf eine Zeile öffnet das Spiel
+* **Verlaufsaufzeichnung** in `history.jsonl`, angehängt und nie umgeschrieben.
+  Jeder Start sofort, jeder von einem Launcher gemeldete Zuwachs an Spielzeit
+  beim nächsten Suchlauf. Sprünge über 24 Stunden werden verworfen, statt einem
+  einzelnen Tag zugeschlagen zu werden
+* Erfolge bzw. Achievements sind bewusst nicht dabei — dafür bräuchte es einen
+  Steam-Web-API-Schlüssel und die Steam-ID
+
 Die Versionsnummer steht an einer Stelle: `gamerack/__init__.py`. Der
 Info-Dialog liest sie von dort, damit beides nicht auseinanderläuft.
 

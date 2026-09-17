@@ -115,6 +115,54 @@ button.card-action {
   border-radius: 10px;
 }
 
+/* --- statistics --------------------------------------------------------- */
+
+.stats-tile {
+  padding: 14px 10px;
+  border-radius: 12px;
+  background-color: @card_bg_color;
+  box-shadow: 0 1px 3px alpha(#000000, 0.14);
+}
+
+.stats-value {
+  font-size: 1.35em;
+  font-weight: 700;
+}
+
+.stats-caption {
+  font-size: 0.82em;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stats-rank {
+  font-size: 1.1em;
+  font-weight: 700;
+  opacity: 0.45;
+  font-feature-settings: "tnum";
+}
+
+.stats-figure {
+  font-weight: 600;
+  font-feature-settings: "tnum";
+}
+
+.stats-note {
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+/* Thin, because it sits under two lines of text and only shows a proportion. */
+progressbar.stats-bar trough,
+progressbar.stats-bar progress {
+  min-height: 4px;
+}
+
+.stats-initials {
+  font-size: 1.1em;
+}
+
 /* --- showcase (PS5) ----------------------------------------------------- */
 
 .showcase .hero {

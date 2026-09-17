@@ -16,6 +16,7 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
 from .. import __version__
 from ..covers import CoverFetcher
 from ..gamepad import Gamepads
+from ..history import History
 from ..launchers import launcher_for
 from ..metadata import MetadataFetcher
 from ..models import Game, Library
@@ -27,6 +28,7 @@ from .grid_view import GridView
 from .list_view import ListView
 from .preferences import PreferencesDialog
 from .showcase_view import ShowcaseView
+from .stats_page import StatsPage
 
 log = logging.getLogger(__name__)
 
@@ -126,6 +128,10 @@ class MainWindow(Adw.ApplicationWindow):
         self.console_button.connect("toggled",
                                     lambda button: self.set_console(button.get_active()))
 
+        stats_button = Gtk.Button(icon_name="histogram-symbolic",
+                                  tooltip_text="Statistik")
+        stats_button.connect("clicked", lambda *_: self.show_stats())
+
         layout_button = Gtk.MenuButton(icon_name="view-grid-symbolic",
                                        tooltip_text="Ansicht",
                                        menu_model=self._layout_menu())
@@ -141,6 +147,7 @@ class MainWindow(Adw.ApplicationWindow):
         header.pack_start(self.spinner)
         header.pack_end(menu_button)
         header.pack_end(layout_button)
+        header.pack_end(stats_button)
         header.pack_end(self.search_button)
         header.pack_end(self.console_button)
 
@@ -173,6 +180,14 @@ class MainWindow(Adw.ApplicationWindow):
         self.detail_page.connect("launcher-requested", lambda _p, gid: self._open_launcher(gid))
         self.detail_page.connect("banner-requested",
                                  lambda _p, gid: self._pick_artwork(gid, "banner"))
+
+        # A library built without a log (tests, scripts) still gets a page;
+        # an empty History simply has nothing to report.
+        if self.library.history is None:
+            self.library.history = History()
+        self.stats_page = StatsPage(self.library, self.library.history)
+        self.stats_page.connect("open-requested",
+                                lambda _p, gid: self.show_detail_page(gid))
 
         self.nav = Adw.NavigationView()
         self.nav.add(self.library_page)
@@ -240,6 +255,7 @@ class MainWindow(Adw.ApplicationWindow):
         menu.append_section(None, section)
 
         section = Gio.Menu()
+        section.append("Statistik", "win.stats")
         section.append("Konsolenmodus", "win.console")
         menu.append_section(None, section)
 
@@ -275,6 +291,7 @@ class MainWindow(Adw.ApplicationWindow):
             "preferences": lambda *_: self._show_preferences(),
             "about": lambda *_: self._show_about(),
             "shortcuts": lambda *_: self._show_shortcuts(),
+            "stats": lambda *_: self.show_stats(),
             "launch-selected": lambda *_: self._launch(self._menu_target),
             "details-selected": lambda *_: self.show_detail_page(self._menu_target),
             "edit-selected": lambda *_: self._show_edit(self._menu_target),
@@ -721,6 +738,12 @@ class MainWindow(Adw.ApplicationWindow):
         self.toasts.add_toast(Adw.Toast(title=f"„{game.name}“ wird gestartet", timeout=3))
         if self.settings["sort"] == "recent":
             GLib.timeout_add_seconds(1, lambda: (self.refresh(), False)[1])
+
+    def show_stats(self) -> None:
+        """Open the statistics page, rebuilt from the log each time."""
+        self.stats_page.refresh()
+        if self.nav.get_visible_page() is not self.stats_page:
+            self.nav.push(self.stats_page)
 
     def show_detail_page(self, game_id: str) -> None:
         """Open the full-page view for one game."""

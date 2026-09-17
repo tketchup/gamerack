@@ -128,8 +128,51 @@ Gamerack nach vorn holt.
 
 Im Ansichtsmenü lässt sich die Bibliothek auf einzelne Quellen einschränken:
 Steam, Heroic, Lutris und Sonstige (Flatpak, Anwendungsmenü, selbst
-eingetragene Spiele). Dazu kommen „Nur installierte“ und „Ausgeblendete
-zeigen“.
+eingetragene Spiele). Dazu kommen „Nur installierte“, „Nur Backlog“ und
+„Ausgeblendete zeigen“.
+
+## Backlog-Score
+
+Jedes Spiel aus einem Launcher bekommt einen Wert von 0 bis 100, der sagt, wie
+fällig es wäre. Er wird aus zwei Faktoren gebildet: wie lange das Spiel
+unangetastet liegt, und wie wenig davon gespielt ist. Bereits versenkte Stunden
+drücken den Wert — achtzig Stunden tief ist kein Backlog. Der höchste
+Startwert geht an Spiele, die installiert und nie gestartet wurden.
+
+Sortierbar über das Ansichtsmenü, sichtbar auf der Detailseite, und „Nur
+Backlog“ engt die Bibliothek auf alles ab 60 Punkten ein. Die Schwelle steht
+als `backlog_min` in den Einstellungen; senkst du sie auf 50, kommt der große
+Stapel dazu, der nur besessen und nie installiert ist.
+
+Ein Kaufdatum führt kein Launcher, deshalb zählt für ein nie gestartetes Spiel
+der Tag, an dem Gamerack es zuerst gesehen hat. Am Anfang ist der Score dadurch
+grob — alle nie gespielten Titel starten gemeinsam auf dem gleichen Wert — und
+er wird über die Monate genauer.
+
+## Statistik
+
+Der Knopf mit dem Balkendiagramm in der Kopfleiste öffnet eine eigene Seite:
+Spielzeit, Starts, Anzahl gespielter Spiele und der Durchschnitt pro aktivem
+Tag, dazu eine Bestenliste nach Spielzeit oder nach Starts. Ein Klick auf eine
+Zeile springt zur Detailseite des Spiels.
+
+Zeitraum wählbar als Woche, Monat, Jahr, jemals oder ein eigener Bereich über
+zwei Kalender. Woche, Monat und Jahr sind rollend gerechnet, also die letzten
+7, 30 und 365 Tage.
+
+**Die Daten beginnen mit dem ersten Start dieser Version.** Die Launcher führen
+nur Summen — Steam kennt die Gesamtspielzeit eines Spiels und den Tag, an dem es
+zuletzt lief, aber keine Zeitreihe. Was vorher gespielt wurde, hat niemand
+mitgeschrieben und fehlt hier. Die Seite sagt das auch selbst, solange der
+gewählte Zeitraum weiter zurückreicht als die Aufzeichnung.
+
+Mitgeschrieben wird zweierlei: jeder Start, den Gamerack auslöst, sofort, und
+jeder Zuwachs an Spielzeit, den ein Launcher meldet, beim nächsten Suchlauf.
+Der zweite Weg kommt in Schüben, weil Steam seine Zahlen erst beim Beenden
+schreibt — die Spielzeit landet dann an dem Tag, an dem Gamerack sie bemerkt,
+was bei einer Sitzung über Mitternacht einen Tag verschieben kann. Ein
+unplausibler Sprung von mehr als 24 Stunden wird verworfen statt einem Tag
+zugeschlagen.
 
 ## Installation
 
@@ -180,13 +223,16 @@ eine vorübergehend nicht erreichbare Festplatte.
 
 ```
 ~/.local/share/gamerack/library.json   erkannte Spiele und deine Änderungen
+~/.local/share/gamerack/history.jsonl  Starts und Spielzeit, für die Statistik
 ~/.local/share/gamerack/covers/        Cover und Banner
 ~/.config/gamerack/settings.json       Einstellungen
 ~/.cache/gamerack/metadata/            Antworten des Steam-Stores
 ```
 
 Bibliothek und Einstellungen sind normales JSON und lassen sich von Hand
-bearbeiten. Der Cache-Ordner kann jederzeit gelöscht werden.
+bearbeiten. Der Cache-Ordner kann jederzeit gelöscht werden. `history.jsonl`
+ist eine Zeile JSON je Ereignis und wird nur angehängt, niemals umgeschrieben —
+löschst du sie, fängt die Statistik von vorn an.
 
 Die Ordner oben liegen außerhalb des Projektordners. Ein Rücksprung auf eine
 ältere Version wirft deine Bibliothek also nicht weg.
