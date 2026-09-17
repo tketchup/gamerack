@@ -137,6 +137,27 @@ Vordergrund ist. Das ist Absicht, damit der Modus vom Sofa aus erreichbar
 bleibt; der Preis ist, dass ein Druck auf Start während eines laufenden Spiels
 Gamerack nach vorn holt.
 
+## Ambient-Modus
+
+Bleibt das Schaufenster eine Minute unberührt, übernimmt eine Bildschau:
+Screenshots der Spiele aus deiner Bibliothek, einzeln im Vollbild, sanft
+überblendet und mit dem Namen unten links. Jede Eingabe beendet sie wieder —
+eine Taste, ein Klick, das Mausrad oder der Controller; die erste Eingabe tut
+sonst nichts, wie bei einem Bildschirmschoner.
+
+Eine ruhende Maus weckt ihn nicht. Erscheint die Bildschau unter einem
+Zeiger, der schon dort lag, liefert das System dafür ein Bewegungsereignis, und
+darauf zu reagieren würde sie im selben Moment wieder schließen. Der Zeiger muss
+sich erst ein Stück bewegen.
+
+Die Bilder sind Steam-Screenshots in 1920×1080, also genau 16:9; passt das nicht
+zum Fenster, wird zugeschnitten statt verzerrt. Gezeigt werden nur Spiele, für
+die ein Bild vorliegt — bei einer Bibliothek von 293 Spielen sind das
+derzeit 221. Geladen wird erst, wenn ein Bild gebraucht wird, und der Ordner
+behält nur die letzten 45.
+
+Abschaltbar unter Einstellungen → Bedienung, zusammen mit der Wartezeit.
+
 ## Filtern
 
 Der Trichter in der Kopfleiste öffnet ein eigenes Fenster über der Bibliothek.
@@ -248,6 +269,7 @@ eine vorübergehend nicht erreichbare Festplatte.
 ~/.local/share/gamerack/covers/        Cover und Banner
 ~/.config/gamerack/settings.json       Einstellungen
 ~/.cache/gamerack/metadata/            Antworten des Steam-Stores
+~/.cache/gamerack/ambient/             Screenshots für den Ambient-Modus
 ```
 
 Bibliothek und Einstellungen sind normales JSON und lassen sich von Hand

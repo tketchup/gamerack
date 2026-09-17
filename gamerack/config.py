@@ -35,6 +35,8 @@ DEFAULTS = {
     "desktop_scan_all": False,       # off: only entries that look like games
     "hide_launchers": False,
     "gamepad": True,                 # read /dev/input/js* for the console mode
+    "ambient": True,                 # slideshow when the showcase sits idle
+    "ambient_delay": 60,             # seconds of stillness before it starts
 }
 
 

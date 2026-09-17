@@ -113,6 +113,25 @@ class PreferencesDialog(Adw.PreferencesDialog):
                         lambda row, *_: self._set("gamepad", row.get_active()))
         control.add(gamepad)
 
+        ambient = Adw.SwitchRow(
+            title="Ambient-Modus",
+            subtitle="Im Schaufenster nach einer Weile ohne Eingabe "
+                     "Screenshots im Vollbild zeigen",
+            active=self.settings["ambient"],
+        )
+        ambient.connect("notify::active",
+                        lambda row, *_: self._set("ambient", row.get_active()))
+        control.add(ambient)
+
+        delay = Adw.SpinRow.new_with_range(15, 600, 15)
+        delay.set_title("Wartezeit")
+        delay.set_subtitle("Sekunden Stillstand, bis er startet")
+        delay.set_value(self.settings["ambient_delay"])
+        delay.connect("notify::value",
+                      lambda row, *_: self._set("ambient_delay",
+                                                int(row.get_value())))
+        control.add(delay)
+
         # Live, because a controller that does nothing gives no other clue as to
         # whether Gamerack sees it, sees it but misreads it, or never got it.
         self.pad_row = Adw.ActionRow(title="Erkannte Controller")

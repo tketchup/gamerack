@@ -67,6 +67,11 @@ def _store(appid: str, payload: dict) -> None:
         pass
 
 
+def cached_details(appid: str) -> dict | None:
+    """What we already have stored for an app, never going to the network."""
+    return _cached(appid) or None if appid else None
+
+
 def appdetails(session: requests.Session, appid: str) -> dict | None:
     """The store's record for one app id, cached on disk between runs."""
     cached = _cached(appid)

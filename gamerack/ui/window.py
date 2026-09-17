@@ -21,6 +21,7 @@ from ..launchers import launcher_for
 from ..metadata import MetadataFetcher
 from ..models import Game, Library
 from ..scanner import run_scan
+from .ambient import AmbientView
 from .artwork_picker import ArtworkPickerDialog
 from .detail_page import GameDetailPage
 from .details import GameDetailsDialog
@@ -198,7 +199,17 @@ class MainWindow(Adw.ApplicationWindow):
         self.nav.add(self.library_page)
 
         self.toasts = Adw.ToastOverlay(child=self.nav)
-        self.set_content(self.toasts)
+
+        # Over everything, header included: a slideshow with a toolbar across
+        # it is not a slideshow.
+        self.ambient = AmbientView()
+        self.ambient.connect("woken", lambda *_: self._stop_ambient())
+        root = Gtk.Overlay(child=self.toasts)
+        root.add_overlay(self.ambient)
+        self.set_content(root)
+
+        self._last_input = time.monotonic()
+        GLib.timeout_add_seconds(2, self._check_idle)
 
         self.context_menu = Gtk.PopoverMenu()
         self.context_menu.set_has_arrow(False)
@@ -210,6 +221,13 @@ class MainWindow(Adw.ApplicationWindow):
         keys = Gtk.EventControllerKey()
         keys.connect("key-pressed", self._on_key)
         self.add_controller(keys)
+
+        # A second one in capture phase, for the idle clock alone: a keystroke
+        # a child swallows is still someone sitting there.
+        watch = Gtk.EventControllerKey()
+        watch.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        watch.connect("key-pressed", lambda *_: (self._note_activity(), False)[1])
+        self.add_controller(watch)
 
         # Capture phase, so the pointer is tracked wherever it is over the
         # window and not only where no child happens to be handling motion.
@@ -353,6 +371,35 @@ class MainWindow(Adw.ApplicationWindow):
         self.settings[key] = new_state
         self.refresh()
 
+    # --- ambient mode -------------------------------------------------------
+
+    def _note_activity(self) -> None:
+        self._last_input = time.monotonic()
+
+    def _check_idle(self) -> bool:
+        """Start the slideshow once the showcase has sat still long enough."""
+        if not self.settings["ambient"] or self.ambient.get_visible():
+            return True
+        if self.view_stack.get_visible_child_name() != "showcase":
+            return True
+        # Only on the library page: the detail page is something you opened on
+        # purpose and are presumably reading.
+        if self.nav.get_visible_page() is not self.library_page:
+            return True
+        if time.monotonic() - self._last_input < self.settings["ambient_delay"]:
+            return True
+        self.ambient.set_games(self._games)
+        if not self.ambient.start():
+            log.info("Ambient-Modus: kein Spiel mit 16:9-Bild verfügbar")
+            self._note_activity()      # do not retry every two seconds
+        return True
+
+    def _stop_ambient(self) -> None:
+        self.ambient.stop()
+        self._note_activity()
+        if self.view_stack.get_visible_child_name() == "showcase":
+            self.showcase_view.grab_focus()
+
     # --- console mode -------------------------------------------------------
 
     def set_console(self, on: bool) -> None:
@@ -408,6 +455,7 @@ class MainWindow(Adw.ApplicationWindow):
 
     def _on_pointer(self, _controller, _x, y: float) -> None:
         """In console mode the header hides until the mouse reaches for it."""
+        self._note_activity()
         if not self.console:
             return
         if y <= BAR_REVEAL_EDGE:
@@ -432,6 +480,12 @@ class MainWindow(Adw.ApplicationWindow):
 
     def _on_pad(self, action: str) -> None:
         """One button or direction from any connected pad."""
+        self._note_activity()
+        if self.ambient.get_visible():
+            # The button that wakes it does nothing else, same as a keypress
+            # against a screensaver.
+            self._stop_ambient()
+            return
         if action in ("start", "guide"):
             self.set_console(not self.console)
             return
@@ -686,6 +740,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.context_menu.popup()
 
     def _launch(self, game_id: str) -> None:
+        self._stop_ambient()
         game = self.library.games.get(game_id)
         if game is None or not game.command:
             self.toasts.add_toast(Adw.Toast(title="Kein Startbefehl hinterlegt"))

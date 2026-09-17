@@ -19,6 +19,10 @@
   solange ein Filter greift. Im Ausklappmenü bleiben nur Ansichtsmodus,
   Cover-Größe und „Nur installierte“; die doppelten Aktionen dafür sind
   entfernt, damit Menü und Fenster nicht auseinanderlaufen können
+* **Ambient-Modus**: nach einer Minute ohne Eingabe im Schaufenster eine
+  Bildschau aus Steam-Screenshots, 1920×1080 und damit genau 16:9, zugeschnitten
+  statt verzerrt. Nur Spiele mit vorhandenem Bild, geladen erst bei Bedarf.
+  Jede Eingabe beendet sie; eine ruhende Maus nicht
 * **Installierte Mods** bei Steam-Spielen auf der Detailseite, mit Name, Größe
   und Änderungsdatum; Klick öffnet die Workshop-Seite. Aus den
   `appworkshop`-Dateien aller Bibliotheksordner, die Namen über den öffentlichen

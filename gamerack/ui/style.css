@@ -115,6 +115,21 @@ button.card-action {
   border-radius: 10px;
 }
 
+/* --- ambient mode ------------------------------------------------------- */
+
+/* Opaque black, not a translucent scrim: it has to hide the library behind
+   it, and a 16:9 picture in a differently shaped window leaves bars. */
+.ambient {
+  background-color: #000000;
+}
+
+.ambient-caption {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: alpha(#ffffff, 0.92);
+  text-shadow: 0 2px 10px alpha(#000000, 0.8);
+}
+
 /* --- statistics --------------------------------------------------------- */
 
 .stats-tile {
