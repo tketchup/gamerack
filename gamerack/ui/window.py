@@ -178,7 +178,7 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.library_page = Adw.NavigationPage(title="Alle Spiele", tag="library",
                                                child=self.toolbar)
-        self.detail_page = GameDetailPage()
+        self.detail_page = GameDetailPage(self.settings)
         self.detail_page.connect("play-requested", lambda _p, gid: self._launch(gid))
         self.detail_page.connect("edit-requested", lambda _p, gid: self._show_edit(gid))
         self.detail_page.connect("hide-requested", lambda _p, gid: self._toggle_hidden(gid))

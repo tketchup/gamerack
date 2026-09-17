@@ -73,6 +73,19 @@ vorgezogen. Abschaltbar unter Einstellungen → Bilder & Daten.
   die Reihe an beiden Enden entsprechend gepolstert.
 * **Liste** — schmale Zeilen, ein Klick klappt kurze Details aus.
 
+### Mods
+
+Bei Steam-Spielen listet die Großansicht die installierten Workshop-Objekte mit
+Namen, Größe und Datum der letzten Änderung; ein Klick öffnet die
+Workshop-Seite. Die Liste kommt aus `appworkshop_<appid>.acf` in allen
+Bibliotheksordnern und ist damit genau das, was Steam wirklich auf der Platte
+liegen hat. Nur die Namen kommen aus dem Netz und werden dauerhaft
+zwischengespeichert, weil sie sich nicht ändern.
+
+DLC ist bewusst nicht dabei. Der Store weiß, was es für ein Spiel *gibt*, aber
+keine Datei sagt, was davon dir gehört — und eine Liste, die wie ein
+Besitzstand aussieht und in Wahrheit ein Katalog ist, wäre schlechter als keine.
+
 ### Großansicht
 
 Banner, Spielzeit, zuletzt gespielt, Kategorien und Beschreibung, dazu

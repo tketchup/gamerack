@@ -2,17 +2,26 @@
 
 from __future__ import annotations
 
+import logging
+import threading
+
 import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, GObject, Gtk, Pango  # noqa: E402
+from gi.repository import Adw, GLib, GObject, Gtk, Pango  # noqa: E402
 
+from ..extras import (humanise_size, humanise_updated, installed_mods,
+                      mod_titles, workshop_url)
+from ..covers import new_session
 from ..launchers import launcher_for
 from ..models import Game, humanise_backlog, humanise_date, humanise_playtime
 from .widgets import Banner
 
+log = logging.getLogger(__name__)
+
 BANNER_HEIGHT = 300
+MOD_ROWS = 25
 
 
 class GameDetailPage(Adw.NavigationPage):
@@ -28,9 +37,11 @@ class GameDetailPage(Adw.NavigationPage):
         "banner-requested": (GObject.SignalFlags.RUN_FIRST, None, (str,)),
     }
 
-    def __init__(self):
+    def __init__(self, settings=None):
         super().__init__(title="Spiel", tag="detail")
         self.game: Game | None = None
+        self.settings = settings
+        self._mod_rows: dict[str, Adw.ActionRow] = {}
 
         self.window_title = Adw.WindowTitle()
         header = Adw.HeaderBar(title_widget=self.window_title)
@@ -146,12 +157,16 @@ class GameDetailPage(Adw.NavigationPage):
             self.facts.add(row)
             self.fact_rows[key] = row
 
+        self.mods = Adw.PreferencesGroup(title="Mods")
+        self.mods.set_visible(False)
+
         content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18,
                           margin_top=20, margin_bottom=30)
         content.append(buttons)
         content.append(self.tags)
         content.append(self.summary)
         content.append(self.facts)
+        content.append(self.mods)
 
         clamp = Adw.Clamp(maximum_size=820, tightening_threshold=640,
                           child=content, margin_start=18, margin_end=18)
@@ -217,6 +232,8 @@ class GameDetailPage(Adw.NavigationPage):
         self._fact("status", "installiert" if game.installed else "nicht installiert")
         self._fact("install_dir", game.install_dir)
 
+        self._set_mods(game)
+
     def _fact(self, key: str, value: str) -> None:
         """Fill a row, or hide it when we have nothing to put there."""
         row = self.fact_rows[key]
@@ -237,3 +254,74 @@ class GameDetailPage(Adw.NavigationPage):
 
     def refresh_artwork(self) -> None:
         self.banner.refresh()
+
+    # --- workshop mods ------------------------------------------------------
+
+    def _set_mods(self, game: Game) -> None:
+        """List the workshop items Steam has on disk for this game.
+
+        Reading the manifests is local and quick enough to do right here; only
+        the titles need the network, and those arrive later.
+        """
+        for row in self._mod_rows.values():
+            self.mods.remove(row)
+        self._mod_rows.clear()
+
+        mods = (installed_mods(game.steam_appid)
+                if game.source == "steam" else [])
+        self.mods.set_visible(bool(mods))
+        if not mods:
+            return
+
+        self.mods.set_description(
+            f"{len(mods)} aus dem Steam Workshop installiert"
+            if len(mods) > 1 else "Einer aus dem Steam Workshop installiert"
+        )
+        for mod in mods[:MOD_ROWS]:
+            row = Adw.ActionRow(title=f"Workshop-Objekt {mod['id']}",
+                                subtitle="  ·  ".join(
+                                    p for p in (humanise_size(mod["size"]),
+                                                humanise_updated(mod["updated"]))
+                                    if p),
+                                activatable=True)
+            row.add_suffix(Gtk.Image(icon_name="external-link-symbolic"))
+            row.connect("activated", self._open_mod, mod["id"])
+            self.mods.add(row)
+            self._mod_rows[mod["id"]] = row
+
+        if len(mods) > MOD_ROWS:
+            rest = Adw.ActionRow(title=f"… und {len(mods) - MOD_ROWS} weitere")
+            rest.set_sensitive(False)
+            self.mods.add(rest)
+            self._mod_rows["_rest"] = rest
+
+        self._load_mod_titles(game.game_id, [m["id"] for m in mods[:MOD_ROWS]])
+
+    def _open_mod(self, _row, item_id: str) -> None:
+        Gtk.UriLauncher(uri=workshop_url(item_id)).launch(
+            self.get_root(), None, None, None
+        )
+
+    def _load_mod_titles(self, game_id: str, ids: list[str]) -> None:
+        allow = self.settings is None or self.settings["fetch_metadata"]
+
+        def work() -> None:
+            try:
+                titles = mod_titles(new_session(), ids, allow_network=allow)
+            except Exception as error:      # a mod list must not break the page
+                log.info("Workshop-Titel nicht abrufbar: %s", error)
+                return
+            GLib.idle_add(self._apply_mod_titles, game_id, titles)
+
+        threading.Thread(target=work, daemon=True, name="workshop").start()
+
+    def _apply_mod_titles(self, game_id: str, titles: dict[str, str]) -> bool:
+        # The page is reused, so a slow answer for a game you already left
+        # must not relabel the one you are looking at now.
+        if self.game is None or self.game.game_id != game_id:
+            return False
+        for item_id, title in titles.items():
+            row = self._mod_rows.get(item_id)
+            if row is not None and title:
+                row.set_title(title)
+        return False

@@ -19,6 +19,11 @@
   solange ein Filter greift. Im Ausklappmenü bleiben nur Ansichtsmodus,
   Cover-Größe und „Nur installierte“; die doppelten Aktionen dafür sind
   entfernt, damit Menü und Fenster nicht auseinanderlaufen können
+* **Installierte Mods** bei Steam-Spielen auf der Detailseite, mit Name, Größe
+  und Änderungsdatum; Klick öffnet die Workshop-Seite. Aus den
+  `appworkshop`-Dateien aller Bibliotheksordner, die Namen über den öffentlichen
+  Workshop-Dienst und dauerhaft zwischengespeichert
+* DLC bleibt draußen: kein lokales Verzeichnis sagt, welche davon man besitzt
 * Erfolge bzw. Achievements sind bewusst nicht dabei — dafür bräuchte es einen
   Steam-Web-API-Schlüssel und die Steam-ID
 
