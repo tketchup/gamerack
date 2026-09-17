@@ -13,6 +13,12 @@
   Jeder Start sofort, jeder von einem Launcher gemeldete Zuwachs an Spielzeit
   beim nächsten Suchlauf. Sprünge über 24 Stunden werden verworfen, statt einem
   einzelnen Tag zugeschlagen zu werden
+* **Filter als eigenes Fenster** hinter dem Trichter in der Kopfleiste:
+  Sortierung, Quellen, Backlog mit Mindestwert und ausgeblendete Spiele, mit
+  laufender Anzahl und einem Knopf zum Zurücksetzen. Der Trichter ist markiert,
+  solange ein Filter greift. Im Ausklappmenü bleiben nur Ansichtsmodus,
+  Cover-Größe und „Nur installierte“; die doppelten Aktionen dafür sind
+  entfernt, damit Menü und Fenster nicht auseinanderlaufen können
 * Erfolge bzw. Achievements sind bewusst nicht dabei — dafür bräuchte es einen
   Steam-Web-API-Schlüssel und die Steam-ID
 

@@ -24,6 +24,7 @@ from ..scanner import run_scan
 from .artwork_picker import ArtworkPickerDialog
 from .detail_page import GameDetailPage
 from .details import GameDetailsDialog
+from .filter_dialog import FilterDialog, filters_active
 from .grid_view import GridView
 from .list_view import ListView
 from .preferences import PreferencesDialog
@@ -132,6 +133,9 @@ class MainWindow(Adw.ApplicationWindow):
                                   tooltip_text="Statistik")
         stats_button.connect("clicked", lambda *_: self.show_stats())
 
+        self.filter_button = Gtk.Button(icon_name="funnel-symbolic")
+        self.filter_button.connect("clicked", lambda *_: self._show_filters())
+
         layout_button = Gtk.MenuButton(icon_name="view-grid-symbolic",
                                        tooltip_text="Ansicht",
                                        menu_model=self._layout_menu())
@@ -148,6 +152,7 @@ class MainWindow(Adw.ApplicationWindow):
         header.pack_end(menu_button)
         header.pack_end(layout_button)
         header.pack_end(stats_button)
+        header.pack_end(self.filter_button)
         header.pack_end(self.search_button)
         header.pack_end(self.console_button)
 
@@ -224,26 +229,18 @@ class MainWindow(Adw.ApplicationWindow):
         section.append("Liste", "win.view::list")
         menu.append_section("Ansicht", section)
 
-        sort_section = Gio.Menu()
-        for key, label in SORTS.items():
-            sort_section.append(label, f"win.sort::{key}")
-        menu.append_section("Sortieren nach", sort_section)
-
         size_section = Gio.Menu()
         for label, value in COVER_SIZES:
             size_section.append(label, f"win.cover-size::{value}")
         menu.append_section("Cover-Größe", size_section)
 
-        source_section = Gio.Menu()
-        for bucket, label in BUCKETS:
-            source_section.append(label, f"win.filter-{bucket}")
-        menu.append_section("Quellen", source_section)
-
+        # Only the switch that gets flipped constantly stays here. Sources,
+        # sorting, backlog and hidden games moved into the filter dialog,
+        # where each one has room for a label that explains it.
         filter_section = Gio.Menu()
         filter_section.append("Nur installierte", "win.only-installed")
-        filter_section.append("Nur Backlog", "win.backlog-only")
-        filter_section.append("Ausgeblendete zeigen", "win.show-hidden")
-        menu.append_section("Filter", filter_section)
+        filter_section.append("Filter…", "win.filters")
+        menu.append_section(None, filter_section)
         return menu
 
     def _main_menu(self) -> Gio.Menu:
@@ -292,6 +289,7 @@ class MainWindow(Adw.ApplicationWindow):
             "about": lambda *_: self._show_about(),
             "shortcuts": lambda *_: self._show_shortcuts(),
             "stats": lambda *_: self.show_stats(),
+            "filters": lambda *_: self._show_filters(),
             "launch-selected": lambda *_: self._launch(self._menu_target),
             "details-selected": lambda *_: self.show_detail_page(self._menu_target),
             "edit-selected": lambda *_: self._show_edit(self._menu_target),
@@ -310,13 +308,6 @@ class MainWindow(Adw.ApplicationWindow):
         view.connect("activate", self._on_view_action)
         self.add_action(view)
 
-        sort = Gio.SimpleAction.new_stateful(
-            "sort", GLib.VariantType.new("s"),
-            GLib.Variant.new_string(self.settings["sort"]),
-        )
-        sort.connect("activate", self._on_sort_action)
-        self.add_action(sort)
-
         cover_size = Gio.SimpleAction.new_stateful(
             "cover-size", GLib.VariantType.new("s"),
             GLib.Variant.new_string(str(self.settings["cover_size"])),
@@ -324,28 +315,18 @@ class MainWindow(Adw.ApplicationWindow):
         cover_size.connect("activate", self._on_cover_size_action)
         self.add_action(cover_size)
 
-        for name, key in (("only-installed", "only_installed"),
-                          ("backlog-only", "backlog_only"),
-                          ("show-hidden", "show_hidden")):
-            action = Gio.SimpleAction.new_stateful(
-                name, None, GLib.Variant.new_boolean(self.settings[key])
-            )
-            action.connect("activate", self._on_toggle_action, key)
-            self.add_action(action)
+        action = Gio.SimpleAction.new_stateful(
+            "only-installed", None,
+            GLib.Variant.new_boolean(self.settings["only_installed"]),
+        )
+        action.connect("activate", self._on_toggle_action, "only_installed")
+        self.add_action(action)
 
         console = Gio.SimpleAction.new_stateful(
             "console", None, GLib.Variant.new_boolean(False)
         )
         console.connect("activate", lambda *_: self.set_console(not self.console))
         self.add_action(console)
-
-        for bucket, _label in BUCKETS:
-            action = Gio.SimpleAction.new_stateful(
-                f"filter-{bucket}", None,
-                GLib.Variant.new_boolean(self.settings.bucket_shown(bucket)),
-            )
-            action.connect("activate", self._on_bucket_action, bucket)
-            self.add_action(action)
 
         self._menu_target = ""
 
@@ -360,11 +341,6 @@ class MainWindow(Adw.ApplicationWindow):
         if name == "showcase":
             self.showcase_view.grab_focus()
 
-    def _on_sort_action(self, action, parameter) -> None:
-        action.set_state(parameter)
-        self.settings["sort"] = parameter.get_string()
-        self.refresh()
-
     def _on_cover_size_action(self, action, parameter) -> None:
         action.set_state(parameter)
         width = int(parameter.get_string())
@@ -375,12 +351,6 @@ class MainWindow(Adw.ApplicationWindow):
         new_state = not action.get_state().get_boolean()
         action.set_state(GLib.Variant.new_boolean(new_state))
         self.settings[key] = new_state
-        self.refresh()
-
-    def _on_bucket_action(self, action, _parameter, bucket: str) -> None:
-        new_state = not action.get_state().get_boolean()
-        action.set_state(GLib.Variant.new_boolean(new_state))
-        self.settings.set_bucket(bucket, new_state)
         self.refresh()
 
     # --- console mode -------------------------------------------------------
@@ -578,6 +548,7 @@ class MainWindow(Adw.ApplicationWindow):
         shown = len(games)
         subtitle = f"{shown} von {total} Spielen" if shown != total else f"{shown} Spiele"
         self.title.set_subtitle(subtitle)
+        self._update_filter_button()
 
         # Always queue: local artwork is resolved even when network fetching
         # is off, and the fetcher skips anything that already has a cover.
@@ -854,6 +825,26 @@ class MainWindow(Adw.ApplicationWindow):
             self.library.remove(game_id)
 
     # --- dialogs ------------------------------------------------------------
+
+    def _show_filters(self) -> None:
+        dialog = FilterDialog(self.settings, BUCKETS, SORTS, self._filter_counts)
+        dialog.connect("changed", lambda *_: self.refresh())
+        dialog.present(self)
+
+    def _filter_counts(self) -> tuple[int, int]:
+        """How many games the current filters leave, and how many exist."""
+        return len(self.visible_games()), len(self.library.visible(True))
+
+    def _update_filter_button(self) -> None:
+        """Mark the funnel while it is actually holding something back."""
+        active = filters_active(self.settings, BUCKETS)
+        if active:
+            self.filter_button.add_css_class("accent")
+        else:
+            self.filter_button.remove_css_class("accent")
+        self.filter_button.set_tooltip_text(
+            "Filter — aktiv" if active else "Filter"
+        )
 
     def _show_preferences(self) -> None:
         dialog = PreferencesDialog(self.settings, self.pads)

@@ -126,10 +126,18 @@ Gamerack nach vorn holt.
 
 ## Filtern
 
-Im Ansichtsmenü lässt sich die Bibliothek auf einzelne Quellen einschränken:
-Steam, Heroic, Lutris und Sonstige (Flatpak, Anwendungsmenü, selbst
-eingetragene Spiele). Dazu kommen „Nur installierte“, „Nur Backlog“ und
-„Ausgeblendete zeigen“.
+Der Trichter in der Kopfleiste öffnet ein eigenes Fenster über der Bibliothek.
+Darin stehen die Sortierung, die Quellen (Steam, Heroic, Lutris und Sonstige —
+also Flatpak, Anwendungsmenü und selbst eingetragene Spiele), der Backlog samt
+Mindestwert und „Ausgeblendete zeigen“. Jede Änderung wirkt sofort, unten steht
+laufend, wie viele Spiele übrig bleiben, und „Zurücksetzen“ nimmt alles auf
+einmal weg.
+
+Solange ein Filter etwas zurückhält, ist der Trichter farbig markiert — sonst
+sucht man lange, warum die Bibliothek halb leer aussieht.
+
+Im Ansichtsmenü bleiben nur die zwei Schalter, die man ständig umlegt: der
+Ansichtsmodus und „Nur installierte“.
 
 ## Backlog-Score
 
