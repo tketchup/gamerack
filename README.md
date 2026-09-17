@@ -182,9 +182,9 @@ sich erst ein Stück bewegen.
 
 Die Bilder sind Steam-Screenshots in 1920×1080, also genau 16:9; passt das nicht
 zum Fenster, wird zugeschnitten statt verzerrt. Gezeigt werden nur Spiele, für
-die ein Bild vorliegt — bei einer Bibliothek von 293 Spielen sind das
-derzeit 221. Geladen wird erst, wenn ein Bild gebraucht wird, und der Ordner
-behält nur die letzten 45.
+die ein Bild vorliegt — in der Praxis für den größten Teil der Bibliothek, denn
+der Steam-Store führt zu fast jedem Spiel Screenshots. Geladen wird erst, wenn
+ein Bild gebraucht wird, und der Ordner behält nur die letzten 45.
 
 Abschaltbar unter Einstellungen → Bedienung, zusammen mit der Wartezeit.
 
@@ -235,10 +235,9 @@ zwei Kalender. Woche, Monat und Jahr sind rollend gerechnet, also die letzten
 **„Jemals“ ist sofort vollständig, die übrigen Zeiträume füllen sich erst.**
 Die Launcher führen Summen: Steam kennt die Gesamtspielzeit eines Spiels, aber
 nicht, an welchem Tag sie zusammenkam. Deshalb rechnet „Jemals“ direkt aus der
-Bibliothek und zeigt vom ersten Start an deine ganze Spielzeit — bei 34
-gespielten Titeln derzeit 501 Stunden. Woche, Monat, Jahr und der eigene
-Bereich brauchen dagegen eine Zeitreihe, und die beginnt mit dem ersten Start
-dieser Version.
+Bibliothek und zeigt vom ersten Start an deine gesamte bisherige Spielzeit.
+Woche, Monat, Jahr und der eigene Bereich brauchen dagegen eine Zeitreihe, und
+die beginnt mit dem ersten Start dieser Version.
 
 Die Starts sind der umgekehrte Fall: die zählt Gamerack selbst, weil kein
 Launcher sie festhält. Bei „Jemals“ steht deshalb die Spielzeit aus dem
