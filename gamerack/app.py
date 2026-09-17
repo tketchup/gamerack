@@ -13,6 +13,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gdk, Gio, Gtk  # noqa: E402
 
 from .config import Settings
+from .history import History
 from .models import Library
 from .paths import APP_ID, ensure_dirs
 from .ui.window import MainWindow
@@ -36,7 +37,9 @@ class GamerackApp(Adw.Application):
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
         self.window: MainWindow | None = None
         self.settings = Settings()
-        self.library = Library()
+        self.history = History()
+        self.history.start()
+        self.library = Library(history=self.history)
 
     def do_startup(self):
         Adw.Application.do_startup(self)

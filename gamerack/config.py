@@ -6,9 +6,14 @@ from .paths import SETTINGS_FILE
 
 DEFAULTS = {
     "view": "grid",                  # grid | showcase | list
-    "sort": "name",                  # name | recent | added | playtime
+    "sort": "name",                  # name | recent | added | playtime | backlog
     "show_hidden": False,
     "only_installed": False,
+    "backlog_only": False,           # narrow the library to the backlog
+    # Score a game needs to count as backlog. 60 means "installed and never
+    # started, or started once and dropped"; lower it to reach the owned-but-
+    # never-installed pile, which all sits just below.
+    "backlog_min": 60,
     "cover_size": 200,               # width of a grid cover, in px
     "scan_on_start": True,
     "fetch_covers": True,

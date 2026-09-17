@@ -9,7 +9,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, GObject, Gtk, Pango  # noqa: E402
 
 from ..launchers import launcher_for
-from ..models import Game, humanise_date, humanise_playtime
+from ..models import Game, humanise_backlog, humanise_date, humanise_playtime
 from .widgets import Banner
 
 BANNER_HEIGHT = 300
@@ -132,6 +132,7 @@ class GameDetailPage(Adw.NavigationPage):
             ("playtime", "Gesamtspielzeit"),
             ("last_played", "Zuletzt gespielt"),
             ("launches", "Gestartet"),
+            ("backlog", "Backlog-Score"),
             ("developer", "Entwickler"),
             ("publisher", "Publisher"),
             ("release", "Erschienen"),
@@ -208,6 +209,7 @@ class GameDetailPage(Adw.NavigationPage):
         self._fact("playtime", humanise_playtime(game.play_seconds).capitalize())
         self._fact("last_played", humanise_date(game.last_played))
         self._fact("launches", f"{game.play_count}×" if game.play_count else "")
+        self._fact("backlog", humanise_backlog(game.backlog_score))
         self._fact("developer", game.developer)
         self._fact("publisher", game.publisher)
         self._fact("release", game.release_date)

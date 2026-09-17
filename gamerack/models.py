@@ -15,6 +15,17 @@ OVERRIDABLE = ("name", "developer", "command", "cover_path", "banner_path", "hid
 # Which launcher a game belongs to, as far as the filters are concerned.
 SOURCE_BUCKETS = {"steam": "steam", "heroic": "heroic", "lutris": "lutris"}
 
+# Backlog score. Two factors, multiplied: how long the game has been left
+# alone, and how little of it has been played. Hours already sunk in push the
+# score down — eighty hours deep is not a backlog, it is a habit.
+BACKLOG_IDLE_DAYS = 365.0      # untouched this long counts as fully idle
+BACKLOG_HALF_HOURS = 6.0       # hours played that halve the score
+# A game never started still gets a floor, higher when it is installed:
+# going as far as putting it on the disk and then never launching it is the
+# clearest backlog there is, and it is the one signal available on day one.
+BACKLOG_FLOOR_INSTALLED = 0.78
+BACKLOG_FLOOR_OWNED = 0.5
+
 
 def humanise_playtime(seconds: int) -> str:
     if seconds <= 0:
@@ -25,6 +36,20 @@ def humanise_playtime(seconds: int) -> str:
     if hours:
         return f"{hours} h {minutes} min gespielt"
     return f"{minutes} min gespielt"
+
+
+def humanise_backlog(score: int | None) -> str:
+    if score is None:
+        return ""
+    if score >= 75:
+        verdict = "längst fällig"
+    elif score >= 50:
+        verdict = "wäre mal dran"
+    elif score >= 25:
+        verdict = "kann warten"
+    else:
+        verdict = "läuft gerade"
+    return f"{score} von 100 — {verdict}"
 
 
 def humanise_date(stamp: float) -> str:
@@ -90,6 +115,31 @@ class Game:
         """The source filter this game falls under."""
         return SOURCE_BUCKETS.get(self.source, "other")
 
+    @property
+    def backlog_score(self) -> int | None:
+        """0–100, how overdue this game is. None for anything not in a launcher.
+
+        The clock for a game never started is `added`, the day Gamerack first
+        saw it, because no launcher records when something was bought. That
+        makes the score coarse at first — every unplayed game starts at the
+        floor together — and sharper the longer the library is kept.
+        """
+        if self.bucket == "other":
+            return None
+        now = time.time()
+        if self.play_seconds <= 0:
+            idle = max(0.0, (now - self.added) / 86400)
+            floor = (BACKLOG_FLOOR_INSTALLED if self.installed
+                     else BACKLOG_FLOOR_OWNED)
+            weight = max(floor, min(1.0, idle / BACKLOG_IDLE_DAYS))
+        else:
+            since = self.last_played or self.added
+            idle = max(0.0, (now - since) / 86400)
+            weight = min(1.0, idle / BACKLOG_IDLE_DAYS)
+        hours = self.play_seconds / 3600
+        weight *= BACKLOG_HALF_HOURS / (BACKLOG_HALF_HOURS + hours)
+        return round(100 * weight)
+
     def apply_scan(self, fresh: "Game") -> bool:
         """Merge a freshly scanned record in, keeping user edits. True if changed."""
         changed = False
@@ -130,8 +180,9 @@ class Game:
 class Library:
     """All known games, persisted as one JSON file."""
 
-    def __init__(self, path: Path = LIBRARY_FILE):
+    def __init__(self, path: Path = LIBRARY_FILE, history=None):
         self.path = path
+        self.history = history
         self.games: dict[str, Game] = {}
         self.load()
 
@@ -170,8 +221,15 @@ class Library:
             if existing is None:
                 self.games[fresh.game_id] = fresh
                 new.append(fresh)
-            elif existing.apply_scan(fresh):
+                continue
+            # Only a game we already knew can have played *since* — a new one
+            # arrives with its whole total, which says nothing about when.
+            before = existing.play_seconds
+            if existing.apply_scan(fresh):
                 updated.append(existing)
+            if self.history is not None:
+                self.history.played(existing.game_id,
+                                    existing.play_seconds - before)
         # Anything a source used to report but no longer does is marked, not deleted:
         # the user may have edits or playtime attached to it.
         scanned_sources = {g.source for g in scanned}

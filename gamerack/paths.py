@@ -22,6 +22,7 @@ CACHE_DIR = CACHE_HOME / "gamerack"
 COVERS_DIR = DATA_DIR / "covers"
 META_DIR = CACHE_DIR / "metadata"
 LIBRARY_FILE = DATA_DIR / "library.json"
+HISTORY_FILE = DATA_DIR / "history.jsonl"
 SETTINGS_FILE = CONFIG_DIR / "settings.json"
 
 

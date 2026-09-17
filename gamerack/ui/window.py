@@ -37,6 +37,7 @@ SORTS = {
     "recent": "Zuletzt gespielt",
     "added": "Zuletzt hinzugefügt",
     "playtime": "Spielzeit",
+    "backlog": "Backlog-Score",
 }
 
 # The source filters, in menu order. "other" collects Flatpak, the application
@@ -225,6 +226,7 @@ class MainWindow(Adw.ApplicationWindow):
 
         filter_section = Gio.Menu()
         filter_section.append("Nur installierte", "win.only-installed")
+        filter_section.append("Nur Backlog", "win.backlog-only")
         filter_section.append("Ausgeblendete zeigen", "win.show-hidden")
         menu.append_section("Filter", filter_section)
         return menu
@@ -306,6 +308,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.add_action(cover_size)
 
         for name, key in (("only-installed", "only_installed"),
+                          ("backlog-only", "backlog_only"),
                           ("show-hidden", "show_hidden")):
             action = Gio.SimpleAction.new_stateful(
                 name, None, GLib.Variant.new_boolean(self.settings[key])
@@ -502,6 +505,10 @@ class MainWindow(Adw.ApplicationWindow):
         games = [g for g in games if self.settings.bucket_shown(g.bucket)]
         if self.settings["only_installed"]:
             games = [g for g in games if g.installed]
+        if self.settings["backlog_only"]:
+            floor = self.settings["backlog_min"]
+            games = [g for g in games
+                     if g.backlog_score is not None and g.backlog_score >= floor]
         if query:
             games = [
                 g for g in games
@@ -517,6 +524,10 @@ class MainWindow(Adw.ApplicationWindow):
             games.sort(key=lambda g: (-g.added, g.sort_name))
         elif sort == "playtime":
             games.sort(key=lambda g: (-g.play_seconds, g.sort_name))
+        elif sort == "backlog":
+            # Games outside a launcher have no score; they go last rather than
+            # disappearing, so switching the sort never hides anything.
+            games.sort(key=lambda g: (-(g.backlog_score or -1), g.sort_name))
         else:
             games.sort(key=lambda g: g.sort_name)
         return games
@@ -704,6 +715,8 @@ class MainWindow(Adw.ApplicationWindow):
 
         game.last_played = time.time()
         game.play_count += 1
+        if self.library.history is not None:
+            self.library.history.launched(game.game_id, game.last_played)
         self.library.save()
         self.toasts.add_toast(Adw.Toast(title=f"„{game.name}“ wird gestartet", timeout=3))
         if self.settings["sort"] == "recent":
