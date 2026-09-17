@@ -1,0 +1,230 @@
+/* Gamerack — visual style. Follows the libadwaita palette so it fits the
+   system theme in both light and dark. */
+
+/* --- covers ------------------------------------------------------------- */
+
+.cover {
+  border-radius: 10px;
+  background-color: shade(@card_bg_color, 0.92);
+}
+
+.cover-initials {
+  font-size: 2.1em;
+  font-weight: 800;
+  color: alpha(#ffffff, 0.85);
+  text-shadow: 0 1px 3px alpha(#000000, 0.4);
+}
+
+/* Fallback tints, picked from the game name so a coverless library still
+   looks deliberate rather than broken. */
+.ph-0 { background-image: linear-gradient(145deg, #3584e4, #1a5fb4); }
+.ph-1 { background-image: linear-gradient(145deg, #9141ac, #613583); }
+.ph-2 { background-image: linear-gradient(145deg, #2ec27e, #26714c); }
+.ph-3 { background-image: linear-gradient(145deg, #e66100, #a51d2d); }
+.ph-4 { background-image: linear-gradient(145deg, #e5a50a, #b5810c); }
+.ph-5 { background-image: linear-gradient(145deg, #c01c28, #7d0f18); }
+.ph-6 { background-image: linear-gradient(145deg, #1c71d8, #613583); }
+.ph-7 { background-image: linear-gradient(145deg, #5e5c64, #2b2a2e); }
+
+/* --- grid --------------------------------------------------------------- */
+
+.game-card {
+  border-radius: 12px;
+  background-color: @card_bg_color;
+  box-shadow: 0 1px 3px alpha(#000000, 0.18);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.game-card:hover {
+  box-shadow: 0 4px 14px alpha(#000000, 0.32);
+}
+
+.game-card .cover {
+  border-radius: 12px 12px 0 0;
+}
+
+.game-title {
+  padding: 9px 12px 11px 12px;
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.game-card.not-installed .cover {
+  opacity: 0.55;
+}
+
+.game-card.not-installed .game-title {
+  color: alpha(currentColor, 0.6);
+}
+
+.game-cell:focus-visible .game-card {
+  outline: 2px solid @accent_color;
+  outline-offset: 2px;
+}
+
+/* The play/info buttons that appear while a tile is hovered, with their scrim.
+   Transparent unless `shown`, so an untouched grid shows its covers as they
+   are — no permanent veil over the artwork. */
+.card-actions {
+  background-color: alpha(#000000, 0.45);
+  opacity: 0;
+  transition: opacity 130ms ease;
+}
+
+.card-actions.shown {
+  opacity: 1;
+}
+
+button.card-action {
+  min-width: 34px;
+  min-height: 34px;
+}
+
+/* --- detail page -------------------------------------------------------- */
+
+.banner {
+  background-color: shade(@window_bg_color, 0.85);
+}
+
+.banner-edit {
+  border-radius: 12px;
+  border: 1px solid @borders;
+}
+
+.detail-buttons button {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.detail-summary {
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+.category-tag {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background-color: alpha(@accent_color, 0.16);
+  color: @accent_color;
+  font-size: 0.88em;
+  font-weight: 600;
+}
+
+.artwork-choice {
+  padding: 6px;
+  border-radius: 10px;
+}
+
+/* --- showcase (PS5) ----------------------------------------------------- */
+
+.showcase .hero {
+  background-color: shade(@window_bg_color, 0.85);
+}
+
+/* Dimmed in the showcase, where text sits on top of it; full strength on the
+   detail page, where the scrim only covers the lower part. */
+.showcase .hero .banner {
+  opacity: 0.7;
+}
+
+.hero-scrim {
+  background-image: linear-gradient(
+    to bottom,
+    alpha(@window_bg_color, 0.25) 0%,
+    alpha(@window_bg_color, 0.75) 55%,
+    @window_bg_color 100%
+  );
+}
+
+.hero-info {
+  margin: 0 40px 28px 40px;
+}
+
+.hero-title {
+  font-size: 2.4em;
+  font-weight: 800;
+  text-shadow: 0 2px 8px alpha(#000000, 0.5);
+}
+
+.hero-subtitle {
+  font-size: 1.05em;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+/* Console mode: bigger type and a heavier hero, for reading across a room. */
+.console .hero-title {
+  font-size: 3.1em;
+}
+
+.console .hero-subtitle {
+  font-size: 1.25em;
+}
+
+.console .showcase .hero {
+  min-height: 380px;
+}
+
+/* No card frame in the strip: the tile is exactly its cover, nothing else. */
+.showcase-card {
+  background-color: transparent;
+  box-shadow: none;
+  opacity: 0.62;
+  transition: opacity 160ms ease;
+}
+
+.showcase-card .cover {
+  border-radius: 10px;
+}
+
+.showcase-card:hover {
+  opacity: 0.85;
+}
+
+.showcase-card.focused {
+  opacity: 1;
+}
+
+.showcase-card.focused .cover {
+  border-radius: 12px;
+  box-shadow: 0 8px 26px alpha(#000000, 0.5);
+  outline: 2px solid alpha(#ffffff, 0.85);
+  outline-offset: 3px;
+}
+
+/* --- list (Steam) ------------------------------------------------------- */
+
+.game-list .row-header {
+  padding: 8px 12px;
+}
+
+.row-cover {
+  border-radius: 6px;
+}
+
+.row-title {
+  font-weight: 600;
+}
+
+.row-subtitle {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
+.row-chevron {
+  opacity: 0.5;
+}
+
+.game-row.expanded .row-title {
+  color: @accent_color;
+}
+
+.row-details {
+  padding: 4px 14px 18px 14px;
+}
+
+.row-meta {
+  font-size: 0.92em;
+  opacity: 0.75;
+  line-height: 1.55;
+}
