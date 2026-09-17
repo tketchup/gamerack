@@ -187,3 +187,25 @@ eine vorübergehend nicht erreichbare Festplatte.
 
 Bibliothek und Einstellungen sind normales JSON und lassen sich von Hand
 bearbeiten. Der Cache-Ordner kann jederzeit gelöscht werden.
+
+Die Ordner oben liegen außerhalb des Projektordners. Ein Rücksprung auf eine
+ältere Version wirft deine Bibliothek also nicht weg.
+
+## Versionen
+
+Der Stand ist in Git festgehalten, jede Version hat eine Marke. Was sich wann
+geändert hat, steht in [CHANGELOG.md](CHANGELOG.md).
+
+```bash
+git -C ~/Documents/code/cartridges tag
+```
+
+Zurück auf eine ältere Version und wieder nach vorn:
+
+```bash
+git checkout v1.1.0
+```
+
+```bash
+git checkout main
+```
