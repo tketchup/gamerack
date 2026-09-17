@@ -271,8 +271,23 @@ Dann im Projektordner:
 ./install.sh
 ```
 
-Das legt `~/.local/bin/gamerack` und einen Menüeintrag an. Ohne Installation
-geht auch `./gamerack.sh`.
+Das **kopiert** das Programm nach `~/.local/lib/gamerack` und legt einen Starter
+in `~/.local/bin/gamerack` sowie einen Menüeintrag an. Der Quellordner wird
+danach nicht mehr gebraucht — du kannst ihn umbenennen, verschieben oder
+löschen, ohne dass die Installation kaputtgeht.
+
+Nach Änderungen am Quellcode einfach erneut ausführen, dann wird die
+installierte Fassung nachgezogen. Zum Entfernen:
+
+```bash
+./install.sh --uninstall
+```
+
+Das löscht nur das Programm. Bibliothek, Cover, Verlauf und Einstellungen
+bleiben liegen, weil sie in deinen Datenordnern stehen und nicht beim Programm.
+
+Zum Entwickeln startet `./gamerack.sh` direkt aus dem Quellordner, ohne
+Installation.
 
 ## Bedienung
 
@@ -302,6 +317,7 @@ eine vorübergehend nicht erreichbare Festplatte.
 ## Dateien
 
 ```
+~/.local/lib/gamerack/                 das installierte Programm
 ~/.local/share/gamerack/library.json   erkannte Spiele und deine Änderungen
 ~/.local/share/gamerack/history.jsonl  Starts und Spielzeit, für die Statistik
 ~/.local/share/gamerack/covers/        Cover und Banner

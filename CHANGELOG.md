@@ -1,5 +1,14 @@
 # Änderungsverlauf
 
+## 1.2.1 — 17.09.2026
+
+* **`install.sh` installiert jetzt wirklich.** Bisher legte es nur einen
+  Starter an, der in den Quellordner wechselte — wurde der umbenannt oder
+  gelöscht, ließ sich Gamerack nicht mehr starten. Das Programm wird jetzt nach
+  `~/.local/lib/gamerack` kopiert und läuft unabhängig vom Quellordner
+* `./install.sh --uninstall` entfernt Programm, Starter und Menüeintrag;
+  Bibliothek und Einstellungen bleiben, weil sie nicht beim Programm liegen
+
 ## 1.2.0 — 17.09.2026
 
 * **Backlog-Score**: 0 bis 100 je Spiel aus einem Launcher, aus Liegezeit und
