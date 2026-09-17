@@ -1,6 +1,6 @@
 # Änderungsverlauf
 
-## Unveröffentlicht
+## 1.2.0 — 17.09.2026
 
 * **Backlog-Score**: 0 bis 100 je Spiel aus einem Launcher, aus Liegezeit und
   bisher gespielten Stunden. Sortierung, Filter „Nur Backlog“ ab 60 Punkten und
