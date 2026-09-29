@@ -1,5 +1,15 @@
 # Änderungsverlauf
 
+## 1.2.2 — 29.09.2026
+
+* **Der Controller steuert Gamerack nicht mehr im Hintergrund mit.** Gamerack
+  liest das Pad direkt vom Kernel und bekam deshalb auch die Eingaben mit, die
+  für das gerade laufende Spiel gedacht waren — bis hin zum doppelten Start oder
+  einem ganz anderen Spiel. Jetzt reagiert es nur noch, solange sein Fenster im
+  Vordergrund ist. Nach einem Start bleibt das Pad außerdem stumm, bis das Spiel
+  den Fokus übernimmt (höchstens 30 Sekunden), und nach der Rückkehr noch einen
+  kurzen Moment, damit der Druck, mit dem man das Spiel beendet, hier nichts auslöst
+
 ## 1.2.1 — 17.09.2026
 
 * **`install.sh` installiert jetzt wirklich.** Bisher legte es nur einen

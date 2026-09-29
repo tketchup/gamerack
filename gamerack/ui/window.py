@@ -55,6 +55,13 @@ BUCKETS = [("steam", "Steam"), ("heroic", "Heroic"), ("lutris", "Lutris"),
 BAR_REVEAL_EDGE = 40
 BAR_HIDE_BELOW = 150
 
+# The pad is read straight from /dev/input, so its buttons reach us whether or
+# not the window has focus. After a launch it stays ignored until the game has
+# taken focus, or for this long if it never does; after focus comes back, for a
+# moment, so the press that quit the game does not also act here.
+PAD_LAUNCH_HOLD = 30
+PAD_RETURN_HOLD = 0.6
+
 
 class MainWindow(Adw.ApplicationWindow):
     __gtype_name__ = "GamerackWindow"
@@ -76,6 +83,8 @@ class MainWindow(Adw.ApplicationWindow):
         self.refresh()
 
         self.pads = Gamepads(self._on_pad) if settings["gamepad"] else None
+        self._pad_hold_until = 0.0
+        self.connect("notify::is-active", self._on_active_changed)
 
         if settings["scan_on_start"]:
             GLib.timeout_add(400, self._start_scan_idle)
@@ -478,9 +487,24 @@ class MainWindow(Adw.ApplicationWindow):
 
     # --- gamepad ------------------------------------------------------------
 
+    def _on_active_changed(self, *_args) -> None:
+        if self.is_active():
+            self._pad_hold_until = time.monotonic() + PAD_RETURN_HOLD
+        else:
+            # Losing focus means the game has arrived; from here on focus alone
+            # decides, so the launch hold must not outlast it.
+            self._pad_hold_until = 0.0
+
+    def _hold_pad(self) -> None:
+        """Ignore the pad until whatever was just started has taken focus."""
+        self._pad_hold_until = time.monotonic() + PAD_LAUNCH_HOLD
+
     def _on_pad(self, action: str) -> None:
         """One button or direction from any connected pad."""
         self._note_activity()
+        if not self.is_active() or time.monotonic() < self._pad_hold_until:
+            log.debug("Gamepad ignoriert, Fenster nicht im Vordergrund: %s", action)
+            return
         if self.ambient.get_visible():
             # The button that wakes it does nothing else, same as a keypress
             # against a screensaver.
@@ -755,6 +779,7 @@ class MainWindow(Adw.ApplicationWindow):
         except (OSError, ValueError) as error:
             self.toasts.add_toast(Adw.Toast(title=f"Start fehlgeschlagen: {error}"))
             return
+        self._hold_pad()
 
         game.last_played = time.time()
         game.play_count += 1
@@ -841,6 +866,7 @@ class MainWindow(Adw.ApplicationWindow):
         except (OSError, ValueError) as error:
             self.toasts.add_toast(Adw.Toast(title=f"{label} startet nicht: {error}"))
             return
+        self._hold_pad()
         self.toasts.add_toast(Adw.Toast(title=f"{label} wird geöffnet", timeout=3))
 
     def _toggle_hidden(self, game_id: str) -> None:
